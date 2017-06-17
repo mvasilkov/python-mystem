@@ -1,5 +1,6 @@
 from pathlib import Path
 import platform
+import re
 
 PACKAGES_ROOT = 'http://download.cdn.yandex.net/mystem/'
 
@@ -16,7 +17,11 @@ PACKAGES = {
     ('Windows', 32): 'mystem-3.0-win7-32bit.zip',
 }
 
-MSDOS = platform.system() == 'Windows'
+RE_ARCHIVE = re.compile('(\.tar\.gz|\.zip)$')
+
+OS = platform.system()
+
+MSDOS = OS == 'Windows'
 
 OUR_ROOT = Path(__file__).parent.resolve()
 
