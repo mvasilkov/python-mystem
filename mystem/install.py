@@ -1,6 +1,6 @@
+from hashlib import sha224
 from pathlib import Path
 import os
-from shutil import copyfileobj
 from subprocess import run, PIPE
 import sys
 import tarfile
@@ -19,7 +19,7 @@ def is_installed():
 def is_usable():
     if is_installed():
         try:
-            a = run('%s -v' % MYSTEM, stdout=PIPE, encoding='utf-8')
+            a = run((str(MYSTEM), '-v'), stdout=PIPE, encoding='utf-8')
             return a.stdout == MYSTEM_VERSION_STRING
         except OSError:
             pass
@@ -32,20 +32,49 @@ def install_impl(bits=64):
     if p not in PACKAGES:
         raise NotImplementedError()
 
-    filetype = RE_ARCHIVE.search(PACKAGES[p]).group()
+    pkg = PACKAGES[p]
+    filetype = RE_ARCHIVE.search(pkg.name).group()
     winrar = ZipFile if filetype == '.zip' else tarfile.open
 
     with TemporaryDirectory() as dirname:
-        filename = Path(dirname) / ('a' + filetype)
-        url = PACKAGES_ROOT + PACKAGES[p]
+        filename = Path(dirname) / ('pkg' + filetype)
+        url = PACKAGES_ROOT + pkg.name
 
         print('Downloading %s' % url, file=sys.stderr)
         print('Saving as %s' % filename, file=sys.stderr)
 
         with urlopen(url) as a, open(filename, 'wb') as b:
-            copyfileobj(a, b)
+            size, checksum = copyfileobj(a, b)
+
+        assert size == pkg.size, 'Incomplete download'
+        assert checksum == pkg.sha224, 'Corrupt download'
 
         print('Extracting to %s' % MYSTEM_DIR, file=sys.stderr)
 
+        # ZipFile before 3.6.2 required str()
         with winrar(str(filename)) as a:
             a.extractall(str(MYSTEM_DIR))
+
+
+def copyfileobj(a, b):
+    size = 0
+    checksum = sha224()
+    progress = 0
+
+    while 1:
+        buf = a.read(64 * 1024)
+        if not buf:
+            break
+
+        b.write(buf)
+        size += len(buf)
+        checksum.update(buf)
+
+        size_mb = size // 2**20
+        if size_mb > progress:
+            progress = size_mb
+            sys.stderr.write('.')
+            sys.stderr.flush()
+
+    print('Done', file=sys.stderr)
+    return (size, checksum.hexdigest())
