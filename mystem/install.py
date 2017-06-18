@@ -1,19 +1,21 @@
-from hashlib import sha224
-from pathlib import Path
 import os
-from subprocess import run, PIPE
+import re
 import sys
 import tarfile
+from hashlib import sha224
+from pathlib import Path
+from subprocess import PIPE, run
 from tempfile import TemporaryDirectory
 from urllib.request import urlopen
 from zipfile import ZipFile
 
-from .capslock import (MYSTEM, MYSTEM_DIR, MYSTEM_VERSION_STRING, OS,
-                       PACKAGES_ROOT, PACKAGES, RE_ARCHIVE)
+from .capslock import (MYSTEM, MYSTEM_DIR, MYSTEM_VERSION_STRING, OS, PACKAGES,
+                       PACKAGES_ROOT)
 
 
 def is_installed():
-    return MYSTEM.is_file() and os.access(MYSTEM, os.X_OK)
+    # return MYSTEM.is_file() and os.access(MYSTEM, os.X_OK)
+    return os.access(MYSTEM, os.F_OK | os.X_OK)
 
 
 def is_usable():
@@ -33,7 +35,7 @@ def install_impl(bits=64):
         raise NotImplementedError()
 
     pkg = PACKAGES[p]
-    filetype = RE_ARCHIVE.search(pkg.name).group()
+    filetype = re.search('(\.tar\.gz|\.zip)$', pkg.name).group()
     winrar = ZipFile if filetype == '.zip' else tarfile.open
 
     with TemporaryDirectory() as dirname:

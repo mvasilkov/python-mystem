@@ -1,7 +1,6 @@
+import platform
 from collections import namedtuple
 from pathlib import Path
-import platform
-import re
 
 PACKAGES_ROOT = 'https://download.cdn.yandex.net/mystem/'
 
@@ -30,8 +29,6 @@ PACKAGES = {
     pkg('mystem-3.0-win7-32bit.zip', 16266428,
         '198fb009758e173e57f6519108ef7309f36d3eca5aae265e2b782dfa'),
 }
-
-RE_ARCHIVE = re.compile('(\.tar\.gz|\.zip)$')
 
 OS = platform.system()
 
