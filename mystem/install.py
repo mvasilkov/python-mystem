@@ -29,10 +29,27 @@ def is_usable():
     return False
 
 
+def uninstall():
+    try:
+        os.unlink(MYSTEM)
+    except FileNotFoundError:
+        pass
+
+
+def install():
+    if not is_usable():
+        uninstall()
+        install_impl(64)
+
+    if not is_usable():
+        uninstall()
+        install_impl(32)
+
+
 def install_impl(bits=64):
     p = (OS, bits)
     if p not in PACKAGES:
-        raise NotImplementedError()
+        raise NotImplementedError('No package for %d-bit %s' % (bits, OS))
 
     pkg = PACKAGES[p]
     filetype = re.search('(\.tar\.gz|\.zip)$', pkg.name).group()

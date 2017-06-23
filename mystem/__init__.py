@@ -1,3 +1,3 @@
-from .install import is_installed, is_usable
+from .install import install, is_installed, is_usable, uninstall
 
-__all__ = ('is_installed', 'is_usable')
+__all__ = ('install', 'is_installed', 'is_usable', 'uninstall')
