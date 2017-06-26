@@ -4,10 +4,10 @@ if __name__ == '__main__':
     setup(
         name='python-mystem',
 
-        version='0.0.2',
+        version='0.0.3',
 
-        description='Python MyStem',
-        long_description='Python MyStem',
+        description='Python wrapper for the MyStem morphological analyzer.',
+        long_description='Python wrapper for the MyStem morphological analyzer.',
 
         url='https://github.com/mvasilkov/python-mystem',
 
@@ -18,11 +18,14 @@ if __name__ == '__main__':
 
         classifiers=[
             'Intended Audience :: Developers',
+            'Intended Audience :: Science/Research',
             'License :: OSI Approved :: MIT License',
+            'Natural Language :: Russian',
             'Programming Language :: Python :: 3',
+            'Topic :: Text Processing :: Linguistic',
         ],
 
-        keywords='mystem',
+        keywords='natural-language-processing morphology MyStem Russian Yandex',
 
         packages=find_packages(),
 
